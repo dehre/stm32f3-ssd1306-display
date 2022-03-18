@@ -7,24 +7,19 @@ message("Entering ${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt")
 #
 set(PROJ_PATH                       ${CMAKE_CURRENT_SOURCE_DIR})
 project(stm32f3-ssd1306-display)
-enable_language(C CXX ASM)
+enable_language(C ASM)
 message("Build type: "              ${CMAKE_BUILD_TYPE})
 
 # Setup compiler settings
 set(CMAKE_C_STANDARD                11)
 set(CMAKE_C_STANDARD_REQUIRED       ON)
 set(CMAKE_C_EXTENSIONS              ON)
-set(CMAKE_CXX_STANDARD              20)
-set(CMAKE_CXX_STANDARD_REQUIRED     ON)
-set(CMAKE_CXX_EXTENSIONS            ON)
 
 #
 # Core MCU flags, CPU, instruction set and FPU setup
 #
 set(CPU_PARAMETERS
     -mthumb
-    # Other parameters
-    # -mcpu, -mfloat, -mfloat-abi, ...
     -mcpu=cortex-m4
 	-mfpu=fpv4-sp-d16
 	-mfloat-abi=hard
@@ -75,9 +70,6 @@ set(include_c_DIRS
 	${PROJ_PATH}/Drivers/CMSIS/Device/ST/STM32F3xx/Include
 	${PROJ_PATH}/Drivers/CMSIS/Include
 )
-set(include_cxx_DIRS
-    
-)
 set(include_asm_DIRS
     
 )
@@ -89,9 +81,6 @@ set(symbols_c_SYMB
     "DEBUG"
 	"USE_HAL_DRIVER"
 	"STM32F303xC"
-)
-set(symbols_cxx_SYMB
-    
 )
 set(symbols_asm_SYMB
     "DEBUG"
@@ -128,7 +117,6 @@ target_link_libraries(${EXECUTABLE} ${link_LIBS})
 target_compile_definitions(${EXECUTABLE} PRIVATE
     # Language specific only
     $<$<COMPILE_LANGUAGE:C>: ${symbols_c_SYMB}>
-    $<$<COMPILE_LANGUAGE:CXX>: ${symbols_cxx_SYMB}>
     $<$<COMPILE_LANGUAGE:ASM>: ${symbols_asm_SYMB}>
 
     # Configuration specific
@@ -144,7 +132,6 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
 target_include_directories(${EXECUTABLE} PRIVATE
     # Language specific only
     $<$<COMPILE_LANGUAGE:C>: ${include_c_DIRS}>
-    $<$<COMPILE_LANGUAGE:CXX>: ${include_cxx_DIRS}>
     $<$<COMPILE_LANGUAGE:ASM>: ${include_asm_DIRS}>
 
     # Configuration specific
@@ -161,12 +148,6 @@ target_compile_options(${EXECUTABLE} PRIVATE
     -Wno-unused-parameter
     $<$<COMPILE_LANGUAGE:C>:
 
-    >
-    $<$<COMPILE_LANGUAGE:CXX>:
-        #-Wno-volatile
-        #-Wold-style-cast
-        #-Wuseless-cast
-        #-Wsuggest-override
     >
     $<$<COMPILE_LANGUAGE:ASM>:
         -x assembler-with-cpp
