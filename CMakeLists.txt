@@ -63,15 +63,12 @@ set(src_drivers_stm32f3xx_hal_driver_src_SRCS
 #
 # Include directories
 #
-set(include_c_DIRS
+set(include_DIRS
     ${PROJ_PATH}/Core/Inc
 	${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Inc
 	${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Inc/Legacy
 	${PROJ_PATH}/Drivers/CMSIS/Device/ST/STM32F3xx/Include
 	${PROJ_PATH}/Drivers/CMSIS/Include
-)
-set(include_asm_DIRS
-    
 )
 
 #
@@ -120,9 +117,7 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
     $<$<COMPILE_LANGUAGE:ASM>: ${symbols_asm_SYMB}>
 
     # Configuration specific
-    $<$<CONFIG:Debug>:
-        DEBUG
-    >
+    $<$<CONFIG:Debug>: DEBUG>
     $<$<CONFIG:Release>: >
 )
 
@@ -131,8 +126,8 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
 #
 target_include_directories(${EXECUTABLE} PRIVATE
     # Language specific only
-    $<$<COMPILE_LANGUAGE:C>: ${include_c_DIRS}>
-    $<$<COMPILE_LANGUAGE:ASM>: ${include_asm_DIRS}>
+    $<$<COMPILE_LANGUAGE:C>: ${include_DIRS}>
+    $<$<COMPILE_LANGUAGE:ASM>: >
 
     # Configuration specific
     $<$<CONFIG:Debug>: >
@@ -146,20 +141,10 @@ target_compile_options(${EXECUTABLE} PRIVATE
     -Wextra
     -Wpedantic
     -Wno-unused-parameter
-    $<$<COMPILE_LANGUAGE:C>:
-
-    >
-    $<$<COMPILE_LANGUAGE:ASM>:
-        -x assembler-with-cpp
-        -MMD
-        -MP
-    >
-    $<$<CONFIG:Debug>:
-        -Og -g3 -ggdb
-    >
-    $<$<CONFIG:Release>:
-        -Og -g0
-    >
+    $<$<COMPILE_LANGUAGE:C>: >
+    $<$<COMPILE_LANGUAGE:ASM>: -x assembler-with-cpp -MMD -MP>
+    $<$<CONFIG:Debug>: -Og -g3 -ggdb>
+    $<$<CONFIG:Release>: -Og -g0>
 )
 
 # Setup linker parameters
