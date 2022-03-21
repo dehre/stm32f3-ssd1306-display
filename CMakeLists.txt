@@ -63,7 +63,7 @@ set(src_drivers_stm32f3xx_hal_driver_src_SRCS
 #
 # Include directories
 #
-set(include_DIRS
+set(include_proj_DIRS
     ${PROJ_PATH}/Core/Inc
 	${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Inc
 	${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Inc/Legacy
@@ -81,6 +81,30 @@ set(symbols_c_SYMB
 )
 set(symbols_asm_SYMB
     "DEBUG"
+)
+
+#
+# Fetch and compile ssd1306 static library
+#
+include(FetchContent)
+FetchContent_Declare(
+  ssd1306
+  GIT_REPOSITORY https://github.com/dehre/ssd1306.git
+  GIT_TAG stm32f3-i2c)
+FetchContent_MakeAvailable(ssd1306)
+
+# Include paths
+target_include_directories(ssd1306 PUBLIC ${include_proj_DIRS})
+
+# Compiler and linker options
+target_compile_options(ssd1306 PUBLIC ${CPU_PARAMETERS})
+
+# Project symbols
+target_compile_definitions(ssd1306 PUBLIC ${symbols_c_SYMB})
+
+# Include directories
+set(include_ssd1306_DIRS
+    ${ssd1306_SOURCE_DIR}/src
 )
 
 #
@@ -104,7 +128,7 @@ add_executable(${EXECUTABLE}
 # Add linked libraries for linker
 #
 set(link_LIBS
-    
+    ssd1306
 )
 target_link_libraries(${EXECUTABLE} ${link_LIBS})
 
@@ -126,7 +150,7 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
 #
 target_include_directories(${EXECUTABLE} PRIVATE
     # Language specific only
-    $<$<COMPILE_LANGUAGE:C>: ${include_DIRS}>
+    $<$<COMPILE_LANGUAGE:C>: ${include_proj_DIRS} ${include_ssd1306_DIRS}>
     $<$<COMPILE_LANGUAGE:ASM>: >
 
     # Configuration specific

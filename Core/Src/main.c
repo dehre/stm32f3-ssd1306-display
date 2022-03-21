@@ -1,4 +1,5 @@
 #include "main.h"
+#include "ssd1306.h"
 
 void SystemClock_Config(void);
 
@@ -7,15 +8,27 @@ void SystemClock_Config(void);
  */
 int main(void)
 {
-    /* Reset of all peripherals, Initializes the Flash interface and the
+    /* Reset of all peripherals, initialize the Flash interface and the
      * Systick. */
     HAL_Init();
 
     /* Configure the system clock */
     SystemClock_Config();
 
+    /* Initialize the 128x32 OLED display over I2C. */
+    ssd1306_128x32_i2c_init();
+
+    const char *lines[] = {"Hello world", "STM32 F3 Discovery", "Lorem Ipsum"};
+    size_t lines_len = sizeof(lines) / sizeof(char *);
+    size_t lines_idx = 0;
+
     while (1)
     {
+        ssd1306_setFixedFont(ssd1306xled_font6x8);
+        ssd1306_clearScreen();
+        ssd1306_printFixed(0, 8, lines[lines_idx], STYLE_NORMAL);
+        lines_idx = (lines_idx + 1) % lines_len;
+        HAL_Delay(1000);
     }
 }
 
