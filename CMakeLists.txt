@@ -94,13 +94,13 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(ssd1306)
 
 # Include paths
-target_include_directories(ssd1306 PUBLIC ${include_proj_DIRS})
+target_include_directories(ssd1306 PRIVATE ${include_proj_DIRS})
 
 # Compiler and linker options
-target_compile_options(ssd1306 PUBLIC ${CPU_PARAMETERS})
+target_compile_options(ssd1306 PRIVATE ${CPU_PARAMETERS})
 
 # Project symbols
-target_compile_definitions(ssd1306 PUBLIC ${symbols_c_SYMB})
+target_compile_definitions(ssd1306 PRIVATE ${symbols_c_SYMB})
 
 # Include directories
 set(include_ssd1306_DIRS
