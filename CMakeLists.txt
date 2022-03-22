@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 3.22)
 
 message("Entering ${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt")
 
+###############################################################################
 #
 # Core project settings
 #
+###############################################################################
+
 set(PROJ_PATH                       ${CMAKE_CURRENT_SOURCE_DIR})
 project(stm32f3-ssd1306-display)
 enable_language(C ASM)
@@ -15,9 +18,13 @@ set(CMAKE_C_STANDARD                11)
 set(CMAKE_C_STANDARD_REQUIRED       ON)
 set(CMAKE_C_EXTENSIONS              ON)
 
+###############################################################################
 #
+# Project's variables
+#
+###############################################################################
+
 # Core MCU flags, CPU, instruction set and FPU setup
-#
 set(CPU_PARAMETERS
     -mthumb
     -mcpu=cortex-m4
@@ -25,13 +32,23 @@ set(CPU_PARAMETERS
 	-mfloat-abi=hard
 )
 
-# Set linker script
+# Symbols definition
+set(symbols_c_SYMB
+	"USE_HAL_DRIVER"
+	"STM32F303xC"
+)
+
+# Set linker script and executable
 set(linker_script_SRC               ${PROJ_PATH}/STM32F303VCTX_FLASH.ld)
 set(EXECUTABLE                      ${CMAKE_PROJECT_NAME})
 
+###############################################################################
 #
+# Project's source files and include directories
+#
+###############################################################################
+
 # Source files
-#
 set(src_core_src_SRCS 
 	${PROJ_PATH}/Core/Src/stm32f3xx_it.c
 	${PROJ_PATH}/Core/Src/stm32f3xx_hal_msp.c
@@ -60,9 +77,7 @@ set(src_drivers_stm32f3xx_hal_driver_src_SRCS
 	${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim.c
 	${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c)
 
-#
 # Include directories
-#
 set(include_proj_DIRS
     ${PROJ_PATH}/Core/Inc
 	${PROJ_PATH}/Drivers/STM32F3xx_HAL_Driver/Inc
@@ -71,21 +86,13 @@ set(include_proj_DIRS
 	${PROJ_PATH}/Drivers/CMSIS/Include
 )
 
+###############################################################################
 #
-# Symbols definition
+# ssd1306 Library
 #
-set(symbols_c_SYMB
-    "DEBUG"
-	"USE_HAL_DRIVER"
-	"STM32F303xC"
-)
-set(symbols_asm_SYMB
-    "DEBUG"
-)
+###############################################################################
 
-#
-# Fetch and compile ssd1306 static library
-#
+# Fetch ssd1306 library
 include(FetchContent)
 FetchContent_Declare(
   ssd1306
@@ -93,61 +100,50 @@ FetchContent_Declare(
   GIT_TAG stm32f3-i2c)
 FetchContent_MakeAvailable(ssd1306)
 
+# Library symbols
+target_compile_definitions(ssd1306 PRIVATE ${symbols_c_SYMB})
+
 # Include paths
 target_include_directories(ssd1306 PRIVATE ${include_proj_DIRS})
 
 # Compiler and linker options
 target_compile_options(ssd1306 PRIVATE ${CPU_PARAMETERS})
 
-# Project symbols
-target_compile_definitions(ssd1306 PRIVATE ${symbols_c_SYMB})
-
 # Include directories
 set(include_ssd1306_DIRS
     ${ssd1306_SOURCE_DIR}/src
 )
 
+###############################################################################
 #
-# Link directories setup
-# Must be before executable is added
+# Executable
 #
-set(link_DIRS
-    
-)
-link_directories(${EXECUTABLE} ${link_DIRS})
+###############################################################################
 
-#
 # Executable files
-#
 add_executable(${EXECUTABLE} 
 	${src_core_src_SRCS}
 	${src_core_startup_SRCS}
 	${src_drivers_stm32f3xx_hal_driver_src_SRCS})
 
-#
 # Add linked libraries for linker
-#
 set(link_LIBS
     ssd1306
 )
 target_link_libraries(${EXECUTABLE} ${link_LIBS})
 
-#
 # Project symbols
-#
 target_compile_definitions(${EXECUTABLE} PRIVATE
     # Language specific only
     $<$<COMPILE_LANGUAGE:C>: ${symbols_c_SYMB}>
-    $<$<COMPILE_LANGUAGE:ASM>: ${symbols_asm_SYMB}>
+    $<$<COMPILE_LANGUAGE:ASM>: >
 
     # Configuration specific
     $<$<CONFIG:Debug>: DEBUG>
     $<$<CONFIG:Release>: >
 )
 
-#
-# Add include paths for each of the compiler
-#
+# Include paths
 target_include_directories(${EXECUTABLE} PRIVATE
     # Language specific only
     $<$<COMPILE_LANGUAGE:C>: ${include_proj_DIRS} ${include_ssd1306_DIRS}>
@@ -186,6 +182,12 @@ target_link_options(${EXECUTABLE} PRIVATE
     -Wl,--end-group
     -Wl,--print-memory-usage
 )
+
+###############################################################################
+#
+# Post Build
+#
+###############################################################################
 
 # Execute post-build to print size
 add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
