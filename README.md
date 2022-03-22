@@ -1,7 +1,6 @@
 # Using the SSD1306 display driver with an STM32 F3 board
 
-This repo shows how to use (a fork of) the [ssd1306](https://github.com/dehre/ssd1306) library to drive a display over I2C.
-
+This repo shows how to use (a fork of) the [ssd1306](https://github.com/dehre/ssd1306) library to drive a display over I2C.  
 Here the STM32 F3 Discovery board is used, but the library works with other F3 boards too.
 
 For the CMake setup I used, check out this [repo](https://github.com/MaJerle/stm32-cube-cmake-vscode).
@@ -30,7 +29,7 @@ ssd1306_128x32_i2c_init(); // or whatever display you're using
   |                         |                      |              |
   |                      GND|______________________|GND           |
   |                         |                      |              |
-  |_STM32F3_DISCOVERY_______|                      |_OLED_Display_|
+  |_STM32F3_________________|                      |_OLED_Display_|
 
 ```
 
@@ -57,7 +56,7 @@ ssd1306_128x32_init();      // or whatever display you're using
   |                         |                      |              |
   |                      GND|______________________|GND           |
   |                         |                      |              |
-  |_STM32F3_DISCOVERY_______|                      |_OLED_Display_|
+  |_STM32F3_________________|                      |_OLED_Display_|
 ```
 
 ## Building & Flashing
